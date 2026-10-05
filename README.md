@@ -1,4 +1,3 @@
-
 <html lang="ru" data-theme="light">
 <head>
 <meta name="color-scheme" content="light">
@@ -131,7 +130,7 @@
 	const urlParams = new URLSearchParams(window.location.search);
 	let steamId = urlParams.get('steamid');
 
-	// Если ID нет в ссылке, проверяем локальную память браузера (чтобы сессия не слетала при перезагрузке)
+	// Если ID нет в ссылке, проверяем локальную память браузера
 	if (!steamId) {
 		steamId = localStorage.getItem('logged_steam_id');
 	} else {
@@ -149,7 +148,7 @@
 				authBlock.innerHTML = `
 					<div class="steam-user-box">
 						<p style="margin:0 0 5px 0; font-size:12px; color:#aaa;">Вы вошли через Steam</p>
-						<div style="font-weight:bold; font-size:16px;">SteamID: ${data.steamId}</div>
+						<div style="font-weight:bold; font-size:14px; word-break:break-all;">SteamID: ${data.steamId}</div>
 						<button onclick="logoutSteam()" style="margin-top:10px; background:#d9534f; color:#fff; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">Выйти</button>
 					</div>
 				`;
@@ -162,19 +161,18 @@
 		showLoginButton();
 	}
 
-	// Функция генерации и показа кнопки входа
+	// Функция генерации кнопки входа с исправленными параметрами OpenID
 	function showLoginButton() {
-		// Твоя ссылка на GitHub Pages для возврата
-		const returnUrl = 'https://ruziiiik1990-beep.github.io/steamlogin/';
+		const returnUrl = 'https://github.io';
 		
-		// Ссылка для отправки запроса авторизации в систему Valve Steam OpenID
+		// Исправленная строка запроса к серверам Valve OpenID
 		const steamOpenIdUrl = 'https://steamcommunity.com' +
-			'?openid.ns=http://openid.net' +
+			'?openid.ns=' + encodeURIComponent('http://openid.net') +
 			'&openid.mode=checkid_setup' +
-			`&openid.return_to=${encodeURIComponent(returnUrl)}` +
-			`&openid.realm=${encodeURIComponent(window.location.origin)}` +
-			'&openid.identity=http://openid.net/identifier_select' +
-			'&openid.claimed_id=http://openid.net/identifier_select';
+			'&openid.return_to=' + encodeURIComponent(returnUrl) +
+			'&openid.realm=' + encodeURIComponent(window.location.origin) +
+			'&openid.identity=' + encodeURIComponent('http://openid.net/identifier_select') +
+			'&openid.claimed_id=' + encodeURIComponent('http://openid.net/identifier_select');
 
 		authBlock.innerHTML = `
 			<a href="${steamOpenIdUrl}" class="steam-login-btn">
@@ -186,7 +184,6 @@
 	// Функция выхода
 	function logoutSteam() {
 		localStorage.removeItem('logged_steam_id');
-		// Очищаем параметры из ссылки и перезагружаем страницу
 		window.location.href = window.location.origin + window.location.pathname;
 	}
 </script>
