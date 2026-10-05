@@ -3,11 +3,11 @@
 <meta name="color-scheme" content="\(COLOR_SCHEME\)">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Страница входа - \(SITE_NAME\)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
 <link rel="stylesheet"
- href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+ href="https://googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+<link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <?if(\(PAGE_ID\) = 'sitePage1' || \(PAGE_ID\) = 'sitePage2' || (\(MODULE_ID\) = 'shop' && (\(PAGE_ID\) = 'category' || \(PAGE_ID\) = 'home' || \(PAGE_ID\) = 'wishlist' || \(PAGE_ID\) = 'usergoods' || \(PAGE_ID\) = 'entry')))?>
 <link type="text/css" rel="stylesheet" href="/.s/t/2301/swiper/swiper-bundle.min.css">
 <?endif?>
@@ -200,7 +200,7 @@
 	function showLoginButton() {
 		const returnUrl = 'https://github.io';
 		
-		// Намертво рабочая строка генерации запроса OpenID к Valve
+		// Ссылка генерации запроса OpenID к Valve
 		const steamOpenIdUrl = 'https://steamcommunity.com' +
 			'?openid.ns=' + encodeURIComponent('http://openid.net') +
 			'&openid.mode=checkid_setup' +
@@ -227,6 +227,8 @@
 </div>
 
 <script src="/.s/t/2301/main.js"></script>
-<?if(BASKET)?><script src="/.s/t/2301/shop-cart.min.js?v=1.0"></script><?endif?>
+<?if(BASKET)?>
+<script src="/.s/t/2301/shop-cart.min.js?v=1.0"></script>
+<?endif?>
 </body>
 </html>
