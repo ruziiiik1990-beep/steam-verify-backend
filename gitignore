@@ -1,0 +1,3 @@
+node_modules/
+steam_verify.db
+.env
