@@ -5,7 +5,7 @@ const admin = require('firebase-admin');
 const app = express();
 app.use(express.json());
 
-// Инициализация Firebase Admin SDK из переменных окружения
+// Собираем объект serviceAccount из переменных Render
 const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID,
   privateKey: process.env.FIREBASE_PRIVATE_KEY,
@@ -18,7 +18,6 @@ admin.initializeApp({
 
 const db = admin.database();
 
-// Эндпоинт для проверки, что Firebase подключён
 app.get('/health', async (req, res) => {
   try {
     const snapshot = await db.ref('/').once('value');
@@ -29,15 +28,11 @@ app.get('/health', async (req, res) => {
   }
 });
 
-// Эндпоинт для сохранения статуса верификации Steam
-// Ожидаем: { userId: "uid", steamCode: "код" }
 app.post('/verify-steam', async (req, res) => {
   const { userId, steamCode } = req.body;
-
   if (!userId || !steamCode) {
     return res.status(400).json({ error: 'userId и steamCode обязательны' });
   }
-
   try {
     const ref = db.ref(`users/${userId}/verification`);
     await ref.update({
@@ -45,19 +40,12 @@ app.post('/verify-steam', async (req, res) => {
       status: 'pending',
       updatedAt: new Date().toISOString(),
     });
-
-    res.json({
-      status: 'ok',
-      message: 'Код отправлен на проверку',
-      userId,
-    });
+    res.json({ status: 'ok', message: 'Код отправлен на проверку', userId });
   } catch (e) {
-    console.error('Error saving verification:', e);
     res.status(500).json({ error: 'Ошибка записи в Firebase', details: e.message });
   }
 });
 
-// Эндпоинт, чтобы получить статус верификации пользователя
 app.get('/user-status/:userId', async (req, res) => {
   const { userId } = req.params;
   try {
