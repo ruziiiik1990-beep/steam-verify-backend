@@ -44,4 +44,25 @@ app.post('/verify-steam', async (req, res) => {
       status: 'pending',
       updatedAt: new Date().toISOString(),
     });
-    res.
+    res.json({ status: 'ok', message: 'Код отправлен на проверку', userId });
+  } catch (e) {
+    console.error('Firebase write error:', e);
+    res.status(500).json({ error: 'Ошибка записи в Firebase', details: e.message });
+  }
+});
+
+app.get('/user-status/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const snapshot = await db.ref(`users/${userId}/verification`).once('value');
+    const data = snapshot.val();
+    res.json(data || { status: 'none' });
+  } catch (e) {
+    res.status(500).json({ error: 'Ошибка чтения статуса', details: e.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
