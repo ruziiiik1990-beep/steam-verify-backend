@@ -1,64 +1,54 @@
-require('dotenv').config();
 const express = require('express');
-const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
-app.use(express.json());
+const PORT = process.env.PORT || 3000;
 
-// Путь к файлу ключа (должен лежать в корне репозитория)
-const keyPath = path.join(__dirname, 'serviceAccountKey.json');
+const achievementsPath = path.join(__dirname, 'achievements.json');
+let achievementsData = [];
+let profileData = {};
 
 try {
-  const rawData = fs.readFileSync(keyPath, 'utf8');
-  const serviceAccount = JSON.parse(rawData);
-
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-  console.log('✅ Firebase успешно инициализирован из файла');
+  const raw = fs.readFileSync(achievementsPath, 'utf8');
+  const json = JSON.parse(raw);
+  achievementsData = Array.isArray(json.achievements) ? json.achievements : [];
+  profileData = typeof json.profile === 'object' ? json.profile : {};
 } catch (e) {
-  console.error('❌ Ошибка инициализации Firebase:', e.message);
-  // Для отладки можно раскомментировать, чтобы видеть детали:
-  // console.error(e);
-  process.exit(1);
+  // Заглушки, если JSON нет — сервер всё равно запустится
+  achievementsData = [
+    { id: 1, name: 'Новичок', description: 'Сыграл первый матч', progress: 100 },
+    { id: 2, name: 'Серия побед', description: '5 побед подряд', progress: 75 },
+    { id: 3, name: 'Мастер карт', description: 'Отыграл все карты турнира', progress: 40 }
+  ];
+  profileData = {
+    steamId: '76561198000000001',
+    nickname: 'CyberKnight',
+    rank: 'Gold I',
+    totalMatches: 127,
+    wins: 83
+  };
 }
 
-const db = admin.database();
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Server running with Firebase' });
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Сервер работает без Firebase',
+    endpoints: {
+      profile: '/api/profile',
+      achievements: '/api/achievements'
+    }
+  });
 });
 
-// Пример запроса (теперь реально пишет в Firebase)
-app.post('/verify-steam', async (req, res) => {
-  const { userId, steamCode } = req.body;
-  if (!userId || !steamCode) {
-    return res.status(400).json({ error: 'userId и steamCode обязательны' });
-  }
-
-  try {
-    // Пример записи в базу (путь под себя можно поменять)
-    await db.ref(`users/${userId}`).set({
-      steamCode,
-      verified: false,
-      timestamp: new Date().toISOString(),
-    });
-    console.log(`✅ Данные для ${userId} сохранены в Firebase`);
-    res.json({
-      status: 'ok',
-      message: 'Данные сохранены в Firebase',
-      userId,
-    });
-  } catch (err) {
-    console.error('❌ Ошибка записи в Firebase:', err.message);
-    res.status(500).json({ error: 'Ошибка записи в базу данных' });
-  }
+app.get('/api/profile', (req, res) => {
+  res.json(profileData);
 });
 
-const PORT = process.env.PORT || 3000;
+app.get('/api/achievements', (req, res) => {
+  res.json(achievementsData);
+});
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Сервер запущен на порту ${PORT}`);
 });
