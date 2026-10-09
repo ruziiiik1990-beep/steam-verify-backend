@@ -1,4 +1,4 @@
-node_modules/
-data/
 .env
+node_modules
 *.log
+.DS_Store
