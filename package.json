@@ -1,7 +1,6 @@
 {
   "name": "steam-verify-backend",
   "version": "1.0.0",
-  "description": "Steam ID Verification API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
