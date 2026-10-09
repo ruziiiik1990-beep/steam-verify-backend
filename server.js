@@ -1,39 +1,27 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const achievementsPath = path.join(__dirname, 'achievements.json');
-let achievementsData = [];
-let profileData = {};
+// Данные прямо в коде — никакого внешнего JSON
+const profileData = {
+  steamId: '76561198000000001',
+  nickname: 'CyberKnight',
+  rank: 'Gold I',
+  totalMatches: 127,
+  wins: 83
+};
 
-try {
-  const raw = fs.readFileSync(achievementsPath, 'utf8');
-  const json = JSON.parse(raw);
-  achievementsData = Array.isArray(json.achievements) ? json.achievements : [];
-  profileData = typeof json.profile === 'object' ? json.profile : {};
-} catch (e) {
-  // Заглушки, если JSON нет — сервер всё равно запустится
-  achievementsData = [
-    { id: 1, name: 'Новичок', description: 'Сыграл первый матч', progress: 100 },
-    { id: 2, name: 'Серия побед', description: '5 побед подряд', progress: 75 },
-    { id: 3, name: 'Мастер карт', description: 'Отыграл все карты турнира', progress: 40 }
-  ];
-  profileData = {
-    steamId: '76561198000000001',
-    nickname: 'CyberKnight',
-    rank: 'Gold I',
-    totalMatches: 127,
-    wins: 83
-  };
-}
+const achievementsData = [
+  { id: 1, name: 'Новичок', description: 'Сыграл первый матч', progress: 100 },
+  { id: 2, name: 'Серия побед', description: '5 побед подряд', progress: 75 },
+  { id: 3, name: 'Мастер карт', description: 'Отыграл все карты турнира', progress: 40 }
+];
 
 app.get('/', (req, res) => {
   res.json({
     status: 'ok',
-    message: 'Сервер работает без Firebase',
+    message: 'Сервер работает без Firebase и без внешних файлов',
     endpoints: {
       profile: '/api/profile',
       achievements: '/api/achievements'
