@@ -5,16 +5,20 @@ const admin = require('firebase-admin');
 const app = express();
 app.use(express.json());
 
-// Собираем объект serviceAccount из переменных Render
 const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID,
   privateKey: process.env.FIREBASE_PRIVATE_KEY,
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
 };
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+try {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+} catch (e) {
+  console.error('Ошибка инициализации Firebase:', e);
+  process.exit(1);
+}
 
 const db = admin.database();
 
@@ -40,24 +44,4 @@ app.post('/verify-steam', async (req, res) => {
       status: 'pending',
       updatedAt: new Date().toISOString(),
     });
-    res.json({ status: 'ok', message: 'Код отправлен на проверку', userId });
-  } catch (e) {
-    res.status(500).json({ error: 'Ошибка записи в Firebase', details: e.message });
-  }
-});
-
-app.get('/user-status/:userId', async (req, res) => {
-  const { userId } = req.params;
-  try {
-    const snapshot = await db.ref(`users/${userId}/verification`).once('value');
-    const data = snapshot.val();
-    res.json(data || { status: 'none' });
-  } catch (e) {
-    res.status(500).json({ error: 'Ошибка чтения статуса', details: e.message });
-  }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+    res.
